@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const validateObjectId = (req, res, next) => {
-  const { userId, petId } = req.params;
-  const idToValidate = userId || petId;
+  const { userId, petId, adoptionId } = req.params;
+  const idToValidate = userId || petId || adoptionId;
 
   if (!mongoose.Types.ObjectId.isValid(idToValidate)) {
     return res

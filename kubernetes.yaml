@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: adoptmeservice
+spec:
+  selector:
+    app: adoptme
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30008 
+  type: NodePort
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adoptmedeployment
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: adoptme
+  template:
+    metadata:
+      labels:
+        app: adoptme
+    spec:
+      containers:
+      - name: adoptmecontainer
+        image: allz06/adoptme:1.0.0
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always 

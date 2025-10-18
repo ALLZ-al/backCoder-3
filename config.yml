@@ -1,0 +1,88 @@
+config:
+  target: "http://localhost:8080" 
+  phases:
+    - duration: 30
+      arrivalRate: 50
+      name: "Calentamiento y Mocking"
+    - duration: 60
+      arrivalRate: 100
+      name: "Carga Media CRUD"
+    - duration: 30
+      arrivalRate: 200
+      name: "Prueba de Estrés"
+
+  variables:
+    userId: null
+    petId: null
+    adoptionId: null 
+
+scenarios:
+  - name: "API Stress Test Scenario"
+    flow:
+      - post:
+          url: "/api/mocks/generateData"
+          json:
+            users: 50
+            pets: 50
+      - get:
+          url: "/api/mocks/mockingusers"
+      - get:
+          url: "/api/mocks/mockingpets"
+          
+      - post:
+          url: "/api/users"
+          json:
+            first_name: "Artillery"
+            last_name: "Test"
+            email: "test-{{$randomString}}-@artillery.com"
+            age: 30
+            password: "testpassword"
+          capture:
+            json: "$.user._id"
+            as: "userId"
+            
+      - post:
+          url: "/api/pets"
+          json:
+            name: "Artie"
+            species: "robot"
+          capture:
+            json: "$.pet._id"
+            as: "petId"
+          
+      - post:
+          url: "/api/adoptions"
+          json:
+            adopter: "{{userId}}"
+            pet: "{{petId}}"
+          capture:
+            json: "$._id" 
+            as: "adoptionId"
+            
+      - get:
+          url: "/api/users/{{userId}}"
+      - get:
+          url: "/api/pets/{{petId}}"
+      - get:
+          url: "/api/adoptions/{{adoptionId}}"
+          
+      - put:
+          url: "/api/users/{{userId}}"
+          json:
+            age: 31
+      - put:
+          url: "/api/pets/{{petId}}"
+          json:
+            name: "Artie-Update"
+      - put:
+          url: "/api/adoptions/{{adoptionId}}"
+          json:
+            status: "adopted" 
+            
+      - delete:
+          url: "/api/adoptions/{{adoptionId}}"
+          
+      - delete:
+          url: "/api/users/{{userId}}"
+      - delete:
+          url: "/api/pets/{{petId}}"

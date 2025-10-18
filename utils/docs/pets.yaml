@@ -1,0 +1,102 @@
+openapi: 3.0.1
+info:
+  title: Documentación del poder y del saber
+  version: 1.0.0
+  description: API pensada para clase de Swagger
+
+paths:
+  /api/pets:
+    get:
+      summary: Obtiene todas las mascotas
+      tags:
+        - Pets
+      responses:
+        "200":
+          description: Lista de mascotas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Pets"
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la base de datos
+    post:
+      summary: Crear Mascota
+      tags:
+        - Pets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createPet"
+      responses:
+        "200":
+          description: Crear una mascota sin imagen
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: string
+                    example: Pet Created
+
+components:
+  schemas:
+    Pets:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: id autogenerado por mongo
+        name:
+          type: string
+          description: Nombre de la mascota
+        specie:
+          type: string
+          description: Especie de la mascota
+        birthDate:
+          type: string
+          format: date
+          description: Fecha de nacimiento (formato YYYY-MM-DD)
+        adopted:
+          type: boolean
+          description: Si está adoptado
+        image:
+          type: string
+          description: URL de la imagen de la mascota
+        __v:
+          type: number
+          description: Versión del documento
+      example:
+        _id: "64f8d2cbd2b123456789abcd"
+        name: Firulais
+        specie: Perro
+        birthDate: "2020-05-15"
+        adopted: true
+        image: "https://miapi.com/images/firulais.jpg"
+        __v: 0
+    createPet:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nombre de la mascota
+        specie:
+          type: string
+          description: Especie de la mascota
+        birthDate:
+          type: string
+          format: date
+          description: Fecha de nacimiento (YYYY-MM-DD)

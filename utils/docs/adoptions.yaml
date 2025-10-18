@@ -1,0 +1,97 @@
+paths:
+  /api/adoptions:
+    get:
+      summary: Obtiene la lista de todas las solicitudes de adopción
+      tags:
+        - Adoptions
+      responses:
+        "200":
+          description: Lista de adopciones obtenida exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Adoption'
+    post:
+      summary: Crea una nueva solicitud de adopción
+      tags:
+        - Adoptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                adopter:
+                  type: string
+                  description: ID del usuario adoptante (ObjectId)
+                pet:
+                  type: string
+                  description: ID de la mascota a adoptar (ObjectId)
+      responses:
+        "201":
+          description: Adopción creada con éxito.
+        "400":
+          description: La mascota ya ha sido adoptada o está pendiente.
+          
+  /api/adoptions/{adoptionId}:
+    get:
+      summary: Obtiene una adopción por su ID
+      tags:
+        - Adoptions
+      parameters:
+        - in: path
+          name: adoptionId
+          schema:
+            type: string
+          required: true
+          description: ID de la adopción (ObjectId de MongoDB)
+      responses:
+        "200":
+          description: Adopción encontrada.
+        "404":
+          description: Adopción no encontrada.
+    put:
+      summary: Actualiza el estado de una adopción
+      tags:
+        - Adoptions
+      parameters:
+        - in: path
+          name: adoptionId
+          schema:
+            type: string
+          required: true
+          description: ID de la adopción a actualizar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [pending, adopted, cancelled]
+      responses:
+        "200":
+          description: Estado de la adopción actualizado.
+        "404":
+          description: Adopción no encontrada.
+    delete:
+      summary: Elimina una adopción por su ID
+      tags:
+        - Adoptions
+      parameters:
+        - in: path
+          name: adoptionId
+          schema:
+            type: string
+          required: true
+          description: ID de la adopción a eliminar.
+      responses:
+        "200":
+          description: Adopción eliminada con éxito.
+        "404":
+          description: Adopción no encontrada para eliminar.

@@ -9,8 +9,10 @@ const router = Router();
 router.get("/mockingpets", (req, res) => {
   try {
     const pets = generateMockPets(100);
+    req.logger.info("Generación de 100 mascotas mock exitosa.");
     res.status(200).json(pets);
   } catch (error) {
+    req.logger.error(`Error al generar mascotas mock: ${error.message}`);
     res.status(500).json({
       error: "Error al generar mascotas mock.",
       details: error.message,
@@ -21,8 +23,10 @@ router.get("/mockingpets", (req, res) => {
 router.get("/mockingusers", (req, res) => {
   try {
     const users = generateMockUsers(50);
+    req.logger.info("Generación de 50 usuarios mock exitosa.");
     res.status(200).json(users);
   } catch (error) {
+    req.logger.error(`Error al generar usuarios mock: ${error.message}`);
     res.status(500).json({
       error: "Error al generar usuarios mock.",
       details: error.message,
@@ -33,6 +37,9 @@ router.get("/mockingusers", (req, res) => {
 router.post("/generateData", async (req, res) => {
   const { users: numUsers, pets: numPets } = req.body;
   if (numUsers === undefined || numPets === undefined) {
+    req.logger.warn(
+      "Petición /generateData recibida sin los parámetros 'users' o 'pets' completos."
+    );
     return res.status(400).json({
       error:
         "Debe especificar el número de 'users' y 'pets' en el cuerpo de la petición.",
@@ -56,12 +63,18 @@ router.post("/generateData", async (req, res) => {
     const petsToInsert = generateMockPets(numPets);
     const insertedPets = await PetModel.insertMany(petsToInsert);
 
+    req.logger.info(
+      `Inserción de datos exitosa: ${insertedUsers.length} usuarios y ${insertedPets.length} mascotas.`
+    );
     res.status(201).json({
       message: `${numUsers} usuarios y ${numPets} mascotas generados e insertados con éxito.`,
       usersInserted: insertedUsers.length,
       petsInserted: insertedPets.length,
     });
   } catch (error) {
+    req.logger.fatal(
+      `FATAL ERROR: Fallo al insertar datos en la base de datos. Detalle: ${error.message}`
+    );
     console.error("Error al generar e insertar datos:", error);
     res.status(500).json({
       error: "Error al generar e insertar datos.",
